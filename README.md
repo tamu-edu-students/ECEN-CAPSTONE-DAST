@@ -4,8 +4,11 @@
 Our project consists of the creation of a dual axis solar tracker which will use light based sensors to allow for the solar panel to move in all four direction and detect the optimal setting for the device to boost efficiency.
 
 3 Subsystems:
+
 Power - Talha Zaheer
+
 MCU - Osman Farook
+
 Mobility and Load - Cooper Hamlin
 
 
