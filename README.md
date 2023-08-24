@@ -7,7 +7,7 @@ Our project consists of the creation of a dual axis solar tracker which will use
 
 Power - Talha Zaheer
 
-MCU - Osman Farook
+MCU - Osman Farook 
 
 Mobility and Load - Cooper Hamlin
 
