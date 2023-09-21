@@ -11,5 +11,7 @@ MCU - Osman Farook
 
 Mobility and Load - Cooper Hamlin
 
+GUI - Alexandra Torres
+
 
 Files available for the subsystems in the different branches
