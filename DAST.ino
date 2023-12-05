@@ -1,68 +1,106 @@
-const int LDR1_PIN = A0;
-const int LDR2_PIN = A1;
-const int LDR3_PIN = A2;
-const int LDR4_PIN = A3;
-const int ENABLE_PIN = 3;
-const int MOTOR_PIN1 = 7;
-const int MOTOR_PIN2 = 9;
+const int motorXPin1 = 2; // X Axis Motor - IN1 on the L298N
+const int motorXPin2 = 3; // X Axis Motor - IN2
+const int motorXPin3 = 4; // X Axis Motor - IN3
+const int motorXPin4 = 5; // X Axis Motor - IN4
+
+const int motorYPin1 = 8; // Y Axis Motor - IN1 on the second L298N
+const int motorYPin2 = 9; // Y Axis Motor - IN2
+const int motorYPin3 = 10; // Y Axis Motor - IN3
+const int motorYPin4 = 11; // Y Axis Motor - IN4
+
+const int ldr1 = A0; // LDR 1
+const int ldr2 = A1; // LDR 2
+const int ldr3 = A2; // LDR 3
+const int ldr4 = A3; // LDR 4
+
+const int threshold = 300; // Threshold for change in resistance (expressed in ohms)
+
+// Previous LDR resistances (initially zero, will be updated in loop)
+float prev_resistance_1 = 0;
+float prev_resistance_2 = 0;
+float prev_resistance_3 = 0;
+float prev_resistance_4 = 0;
 
 void setup() {
-  pinMode(ENABLE_PIN, OUTPUT);
-  pinMode(MOTOR_PIN1, OUTPUT);
-  pinMode(MOTOR_PIN2, OUTPUT);
-  digitalWrite(ENABLE_PIN, HIGH); // enable the motor driver
-  Serial.begin(9600);  // initialize serial communication
+  pinMode(motorXPin1, OUTPUT);
+  pinMode(motorXPin2, OUTPUT);
+  pinMode(motorXPin3, OUTPUT);
+  pinMode(motorXPin4, OUTPUT);
+
+  pinMode(motorYPin1, OUTPUT);
+  pinMode(motorYPin2, OUTPUT);
+  pinMode(motorYPin3, OUTPUT);
+  pinMode(motorYPin4, OUTPUT);
+
+  Serial.begin(9600); // Start Serial communication
 }
 
 void loop() {
-  int ldr1_value = analogRead(LDR1_PIN);
-  int ldr2_value = analogRead(LDR2_PIN);
-  int ldr3_value = analogRead(LDR3_PIN);
-  int ldr4_value = analogRead(LDR4_PIN);
+  // Read current LDR values
+  int ldr_value_1 = analogRead(ldr1);
+  int ldr_value_2 = analogRead(ldr2);
+  int ldr_value_3 = analogRead(ldr3);
+  int ldr_value_4 = analogRead(ldr4);
 
-  // convert analog values to voltage values
-  float ldr1_voltage = ldr1_value * (5.0 / 1023.0);
-  float ldr2_voltage = ldr2_value * (5.0 / 1023.0);
-  float ldr3_voltage = ldr3_value * (5.0 / 1023.0);
-  float ldr4_voltage = ldr4_value * (5.0 / 1023.0);
+  // Calculate the resistance and voltage drop of each LDR
+  float resistance_1 = (float)(1023 - ldr_value_1) * 10000 / ldr_value_1;
+  float voltage_drop_1 = (float)ldr_value_1 * 5 / 1023;
 
-  // print voltage values to serial monitor
-  Serial.print("LDR 1 Voltage: ");
-  Serial.print(ldr1_voltage);
-  Serial.print("V | Resistance: ");
-  Serial.print((5.0-ldr1_voltage)/ldr1_voltage * 10e3);
-  Serial.print("kOhm\n");
+  float resistance_2 = (float)(1023 - ldr_value_2) * 10000 / ldr_value_2;
+  float voltage_drop_2 = (float)ldr_value_2 * 5 / 1023;
 
-  Serial.print("LDR 2 Voltage: ");
-  Serial.print(ldr2_voltage);
-  Serial.print("V | Resistance: ");
-  Serial.print((5.0-ldr2_voltage)/ldr2_voltage * 10e3);
-  Serial.print("kOhm\n");
+  float resistance_3 = (float)(1023 - ldr_value_3) * 10000 / ldr_value_3;
+  float voltage_drop_3 = (float)ldr_value_3 * 5 / 1023;
 
-  Serial.print("LDR 3 Voltage: ");
-  Serial.print(ldr3_voltage);
-  Serial.print("V | Resistance: ");
-  Serial.print((5.0-ldr3_voltage)/ldr3_voltage * 10e3);
-  Serial.print("kOhm\n");
+  float resistance_4 = (float)(1023 - ldr_value_4) * 10000 / ldr_value_4;
+  float voltage_drop_4 = (float)ldr_value_4 * 5 / 1023;
 
-  Serial.print("LDR 4 Voltage: ");
-  Serial.print(ldr4_voltage);
-  Serial.print("V | Resistance: ");
-  Serial.print((5.0-ldr4_voltage)/ldr4_voltage * 10e3);
-  Serial.print("kOhm\n");
+  // Print the resistance and voltage drop values to the serial monitor
+  Serial.print("LDR 1 - Resistance: "); Serial.print(resistance_1); Serial.print(" Ohms, Voltage Drop: "); Serial.print(voltage_drop_1); Serial.println(" V");
+  Serial.print("LDR 2 - Resistance: "); Serial.print(resistance_2); Serial.print(" Ohms, Voltage Drop: "); Serial.print(voltage_drop_2); Serial.println(" V");
+  Serial.print("LDR 3 - Resistance: "); Serial.print(resistance_3); Serial.print(" Ohms, Voltage Drop: "); Serial.print(voltage_drop_3); Serial.println(" V");
+  Serial.print("LDR 4 - Resistance: "); Serial.print(resistance_4); Serial.print(" Ohms, Voltage Drop: "); Serial.print(voltage_drop_4); Serial.println(" V");
 
-  // adjust motor direction based on LDR values
-  if (ldr1_value < ldr4_value && ldr2_value < ldr4_value && ldr3_value < ldr4_value) {
-    digitalWrite(MOTOR_PIN1, HIGH);
-    digitalWrite(MOTOR_PIN2, LOW);
-  } else if (ldr1_value > ldr4_value && ldr2_value < ldr4_value && ldr3_value < ldr4_value) {
-    digitalWrite(MOTOR_PIN1, LOW);
-    digitalWrite(MOTOR_PIN2, HIGH);
-  } else if (ldr1_value < ldr4_value && ldr2_value > ldr4_value && ldr3_value < ldr4_value) {
-    digitalWrite(MOTOR_PIN1, HIGH);
-    digitalWrite(MOTOR_PIN2, LOW);
-  } else if (ldr1_value < ldr4_value && ldr2_value < ldr4_value && ldr3_value > ldr4_value) {
-    digitalWrite(MOTOR_PIN1, LOW);
-    digitalWrite(MOTOR_PIN2, HIGH);
+  // Calculate change in resistance
+  float change_resistance_1 = abs(resistance_1 - prev_resistance_1);
+  float change_resistance_2 = abs(resistance_2 - prev_resistance_2);
+  float change_resistance_3 = abs(resistance_3 - prev_resistance_3);
+  float change_resistance_4 = abs(resistance_4 - prev_resistance_4);
+
+  // Update previous resistance values
+  prev_resistance_1 = resistance_1;
+  prev_resistance_2 = resistance_2;
+  prev_resistance_3 = resistance_3;
+  prev_resistance_4 = resistance_4;
+
+  // Check if any LDR resistance has changed more than the threshold
+  if (change_resistance_1 > threshold || change_resistance_2 > threshold || change_resistance_3 > threshold || change_resistance_4 > threshold) {
+    // Resistance values have changed significantly; move motors
+    // Define the logic for when and how to move the motors here
+    // For now, let's rotate both motors forward as an example
+    rotateMotor(motorXPin1, motorXPin2, motorXPin3, motorXPin4, true);
+    rotateMotor(motorYPin1, motorYPin2, motorYPin3, motorYPin4, true);
+    Serial.println("Motors moving forward");
+  } else {
+    // Resistance values have not changed significantly; do not move motors
+    Serial.println("No significant change in resistance, motors are stopped.");
   }
+
+  delay(1000); // Delay for a moment before next reading
+}
+
+void rotateMotor(int pin1, int pin2, int pin3, int pin4, bool direction) {
+  // Rotate the motor in the specified direction
+  // Define the stepping sequence based on your motor's specifications
+  // This is just a placeholder and should be replaced with the actual step sequence
+  digitalWrite(pin1, HIGH);
+  digitalWrite(pin2, LOW);
+  digitalWrite(pin3, HIGH);
+  digitalWrite(pin4, LOW);
+  delay(700);
+  digitalWrite(pin1, LOW);
+  digitalWrite(pin2, HIGH);
+  digitalWrite(pin3, LOW);
+  digitalWrite(pin4, HIGH);
+  delay(700);
 }
