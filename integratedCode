@@ -1,0 +1,134 @@
+#include <Wire.h>
+#include <Adafruit_Sensor.h>
+#include <Adafruit_MPU6050.h>
+#include <Adafruit_INA219.h>
+#include <WiFi.h>
+#include <WiFiClientSecure.h>
+#include <HTTPClient.h>
+
+// wifi login
+const char* ssid     = "TAMU_VISITOR";
+//const char* password = "84-emerald-8200";
+
+String apiKeyValue = "tPmAT5Ab3j7F9";
+String sensorName = "MPU6050_INA219";
+String sensorLocation = "School";
+
+const int currentSensorPin = 34; // GPIO34 for ADC6 on mcu
+const int voltageSensorPin = 39; // GPIO39 for ADC3 on mcu
+
+Adafruit_MPU6050 mpu;  // MPU6050 object
+Adafruit_INA219 ina219; // INA219 object
+
+void setup() {
+  Serial.begin(115200);
+
+  //initialize MPU6050
+  if (!mpu.begin()) {
+    Serial.println("Failed to find MPU6050 chip");
+    while (1) {
+      delay(10);
+    }
+  }
+
+  //initialize INA219
+  if (!ina219.begin()) {
+    Serial.println("Failed to find INA219 chip");
+    while (1) {
+      delay(10);
+    }
+  }
+    //configuring the mpu6050
+  mpu.setAccelerometerRange(MPU6050_RANGE_2_G);
+  mpu.setGyroRange(MPU6050_RANGE_250_DEG);
+  mpu.setFilterBandwidth(MPU6050_BAND_21_HZ);
+
+  
+  //connecting to  wifi
+  WiFi.begin(ssid);
+  Serial.println("Connecting");
+  while (WiFi.status() != WL_CONNECTED) {
+    delay(500);
+    Serial.print(".");
+  }
+
+//outputs ip address once theres a connection
+  Serial.println("");
+  Serial.print("Connected to WiFi network with IP Address: ");
+  Serial.println(WiFi.localIP());
+
+  // initializing ADC for voltage and current sensors
+  pinMode(voltageSensorPin, INPUT);
+  pinMode(currentSensorPin, INPUT);
+  
+}
+
+void loop() {
+  //reading data from mpu6050
+  sensors_event_t a, g, temp;
+  mpu.getEvent(&a, &g, &temp);
+
+
+  //prepping ina219 sensor readings
+  float shuntvoltage = 0;
+  float busvoltage = 0;
+  float current_mA = 0;
+  float loadvoltage = 0;
+
+  shuntvoltage = ina219.getShuntVoltage_mV();
+  busvoltage = ina219.getBusVoltage_V();
+  current_mA = ina219.getCurrent_mA();
+  loadvoltage = busvoltage + (shuntvoltage / 1000);
+
+  //printing ina219 readings (from earlier testing with the ina219 sensor)
+  Serial.print("Bus Voltage:   "); Serial.print(busvoltage); Serial.println(" V");
+  Serial.print("Shunt Voltage: "); Serial.print(shuntvoltage); Serial.println(" mV");
+  Serial.print("Load Voltage:  "); Serial.print(loadvoltage); Serial.println(" V");
+  Serial.print("Current:       "); Serial.print(current_mA); Serial.println(" mA");
+
+
+  // read voltage from the ADC voltage sensor
+  int voltageValue = analogRead(voltageSensorPin);
+  float voltage = voltageValue * (5.0 / 1023.0); // Convert to voltage
+
+
+  Serial.print("Voltage: "); Serial.print(voltage); Serial.println(" V");
+
+  // check WiFi connection status
+  if (WiFi.status() == WL_CONNECTED) {
+    WiFiClientSecure *client = new WiFiClientSecure;
+    client->setInsecure(); //disables SSL certificate
+    HTTPClient https;
+
+    //start http connection and sends http request
+    https.begin(*client, serverName);
+    https.addHeader("Content-Type", "application/x-www-form-urlencoded");
+
+    //prepping the data to send to database 
+    String httpRequestData = "api_key=" + apiKeyValue + "&sensor=" + sensorName
+                          + "&location=" + sensorLocation + "&value1=" + String(a.acceleration.x)
+                          + "&value2=" + String(a.acceleration.y) + "&value3=" + String(a.acceleration.z)
+                          + "&value4=" + String(bus_voltage) + "&value5=" + String(current_mA) + "&value6=" + String(voltage);
+    Serial.print("httpRequestData: ");
+    Serial.println(httpRequestData);
+
+    //sends the post request to database files
+    int httpResponseCode = https.POST(httpRequestData);
+
+    //prints the http response (200, 500, etc) in the serial monitor
+    if (httpResponseCode > 0) {
+      Serial.print("HTTP Response code: ");
+      Serial.println(httpResponseCode);
+    } else { //else error
+      Serial.print("Error code: ");
+      Serial.println(httpResponseCode);
+    }
+    https.end();
+
+//lets me know that the mcu is no longer connected to wifi 
+  } else {
+    Serial.println("WiFi Disconnected");
+  }
+
+  delay(30000); // send an HTTP POST request every 30 seconds
+}

@@ -1,0 +1,401 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge"/>
+        <meta http-equiv="viewport" content="width=device-width, initial-scale=1.0"/>
+        <link rel="stylesheet" href="css/bootstrap.min.css" />
+        <link rel="stylesheet" href="css/dataTables.bootstrap5.min.css" />
+        <link rel="stylesheet" href="path/to/boxicons.min.css">
+        <link rel="stylesheet" type="text/css" href="esp-style.css">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+
+        <link
+          rel="stylesheet"
+          href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.4.1/font/bootstrap-icons.css"
+        />
+        <link rel="stylesheet" href="css/style.css" /> <!--links to style.css file for class defs--> 
+        
+        <header class="header" style="color: white;"> 
+            <h1>Team 41: Dual Axis Solar Panel</h1> <!-- heading, most important info at top -->
+            <h2 style="font-size: 25px;">Dashboard of Sensor Readings</h2>
+            <form method="get">
+                <input type="number" name="readingsCount" min="1" placeholder="Latest # of Readings"> <!--user input box to type in how many user readings they want to display-->
+                <input type="submit" value="Update">             </form> <!--the minimum # you can isnert into text input field is 1-->
+        </header>  
+
+    </head>
+    <body>
+        <p>Last reading taken: <?php echo $last_reading_time; ?></p>
+
+      
+        <section class="content">
+            <!-- Battery Voltage Display -->
+            <div class="box gauge--2" style="background-color: #f2f2f2; padding: 10px; border-radius: 5px; margin-bottom: 20px;">
+                <h3>VOLTAGE VALUE (V)</h3>
+                <table >
+                    <tr>
+                        <td>MOSFET Output Voltage: </td>
+                    </tr>
+                    <tr>
+                        <td><?php echo $last_voltage; ?> V</td>
+                    </tr>
+                    <tr>
+                        <td>Buck Converter Output Voltage: </td>
+                    </tr>
+                    <tr>
+                        <td><?php echo $last_BuckVoltage; ?> V</td>
+                    </tr>
+                </table>
+                
+                <h3 style="margin-top: 60px;">CURRENT VALUE (A)</h3>
+                <table>
+                    <tr>
+                        <td>Current from Load: <?php echo $last_current; ?> A</td>
+                    </tr>
+                </table>
+            </div>
+    
+    
+            <!-- Solar Panel Orientation -->
+            <div class="box gauge--2"style="background-color: #f2f2f2; padding: 10px; border-radius: 5px;margin-bottom: 20px;">
+                <h3>SOLAR PANEL ORIENTATION</h3>
+                <div class="gyroscope-model">
+                    <img src="MPU6050-coordinate-system.png" alt="Gyroscope Model" width="200" height="150" />
+                </div>
+                <p>X-Axis: <?php echo $last_reading_x; ?> m/s²</p>
+                <p>Y-Axis: <?php echo $last_reading_y; ?> m/s²</p>
+                <p>Z-Axis: <?php echo $last_reading_z; ?> m/s²</p>
+            </div>
+        </section>
+
+
+        <!-- top navigation bar -->
+        <nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top  ">
+          <div class="container-fluid">
+
+            <!-- off canvas trigger-->
+            <button class="navbar-toggler me-2 bg-dark " type="button" data-bs-toggle="offcanvas" data-bs-target="#offcanvasExample" aria-controls="offcanvasExample">
+              <span class="navbar-toggler-icon" data-bs-target="#offcanvasExample">
+              </span>
+            </button>
+
+
+            <!--**Just putting a title on the Top nav bar-->
+            <a class="navbar-brand me-auto fw-bold ps-2 text-black" href="#">
+              Solar Tracking System
+            </a>
+            
+
+          </div>
+        </nav>
+
+        
+
+        <!-- Off canvas menu-->        
+        <div 
+          class="offcanvas offcanvas-start bg-dark  text-white  " 
+          tabindex="-1" 
+          id="offcanvasExample" 
+          aria-labelledby="offcanvasExampleLabel"
+        >
+          <div class="offcanvas-body p-0">
+            <nav class="navbar-dark">
+                <ul class="navbar-nav" >
+                  <!--
+                    adding "MENU" -->
+                    <li class="my-3"></li>
+                    <li>
+                      <div class="text-muted small bigger-text d-flex justify-content-center  ">
+                        Welcome Back!            
+                      </div>
+                    </li>
+
+                    <!--
+                      adding "Dashboard"
+                    -->
+                    <li class="my-4"></li>
+                    <li>
+                      <a href="#" class="nav-link px-2  active">
+                        <span class="me-2"> <!-- px-2 puts an indention to the text on the left side-->
+                          <i class="bi bi-speedometer2 px-2"></i>
+                        </span>
+                        <span>Dashboard</span>
+                      </a>
+                    </li>
+
+                    <!-- adding the divider-->
+                    <li class="my-2"></li>
+                    <li>
+                      <hr class="dropdown-divider ">
+                    </li>
+
+
+                    <!-- adding the "Core" text on navigation bar"-->
+                    <li class="my-2 "></li>
+                    <li>
+                      <div class="text-muted small fw-bold px-1  text-uppercase ps-3 ">
+                        CORE        
+                      </div>
+                      
+                    </li>
+
+
+
+                    <!--
+                      Adding the collapse feature to the "Overview" button
+                    -->
+                    <li>
+                      <!--"px-2" adds an indented spacing in front of text-->
+                      <a 
+                        class="nav-link px-1 sidebar-link text-white me-2 align-text-bottom " 
+                        data-bs-toggle="collapse" 
+                        href="#collapseExample" 
+                        role="button" 
+                        aria-expanded="false" 
+                        aria-controls="collapseExample"
+                        >
+
+                        <!--adding the "overview" text-->
+                        <div class="d-flex align-items-center my-3 ">
+                          <span class="px-1">
+                            <i class="bi bi-layout-split px-2"></i>
+                          </span>
+                          <span class="px-2 ">Overview</span>
+                        </div>
+
+                        <!-- adding the toggle down next to "overview"-->
+                        <span class="ms-auto">
+                          <span class="right-icon">
+                            <i class="bi bi-chevron-down"></i>
+                          </span>
+                        </span>
+                      </a>
+
+
+                      <!--
+                        adding content under the Overview toggle
+                      -->
+                      <div class="collapse" id="collapseExample">
+                        <div>
+                          <ul class="navbar-nav ps-1 ">
+                            <li>
+                              <a href="#" class="nav-link ps-5   text-white">
+                                <span>
+                                  Project Overview
+                                </span>
+                              </a>
+                            </li>
+                            <li>
+                              <a href="#" class="nav-link ps-5 my-3 text-white">
+                                <span>
+                                  Panel Management
+                                </span>
+                              </a>
+                            </li>
+                      </div>
+
+                      <!------------------------------------------------------------>
+
+                      <!-- adding the divider-->
+                      <li class="my-2"></li>
+                      <li>
+                        <hr class="dropdown-divider ">
+                      </li> 
+
+                      <!-------------------------------------------------------------->
+
+                      
+                      <!-- adding the device information text on website"-->
+                      <li class="my-2 "></li>
+                      <li>
+                        <div class="text-muted small fw-bold px-1 text-uppercase ps-3 ">
+                          Device Information        
+                        </div>
+                        
+                      </li>
+
+
+                      <!-- Adding the device manual text-->
+                    
+                      <li class="nav-link sidebar-link"></li>
+                      <li class="ml-1"> <!-- Adjust the margin-left value as needed -->
+                        <a href="#" class="nav-link px-2  active">
+                          <span class="me-2 "> <!-- puts an indention to the text on the left side-->
+                            <i class="bi bi-book px-2 "></i>
+                          </span>
+                          <span>Device Manual</span>
+                        </a>
+                      </li>
+
+
+                      <!-- Adding the system update text-->
+                      
+                      <li class="nav-link sidebar-link"></li>
+                      <li class="ml-1"> <!-- Adjust the margin-left value as needed -->
+                        <a href="#" class="nav-link px-2  active">
+                          <span class="me-2"> <!-- puts an indention to the text on the left side-->
+                            <i class="bi bi-box-arrow-down px-2"></i>
+                          </span>
+                          <span>System update</span>
+                        </a>
+                      </li>
+
+
+                      <!------------------------------------------------------------------>
+                      
+
+                      <!-- adding the divider-->
+                      <li class="my-2"></li>
+                      <li>
+                        <hr class="dropdown-divider ">
+                      </li> 
+
+                      
+                      <!------------------------------------------------------------------>
+                      
+                      <!--adding help & contact us buttons-->
+                      
+                      <div class="my-5 "> <!-- putting this text 5 units below the divider-->
+                        <li class="ml-1"> <!-- Adjust the margin-left value as needed -->
+                          <a href="#" class="nav-link px-3 active">
+                            <span>Help</span>
+                          </a>
+                        </li>
+
+
+                        <li class="nav-link sidebar-link "></li>
+                        <li class="ml-1"> <!-- Adjust the margin-left value as needed -->
+                          <a href="#" class="nav-link px-3 active">
+                            <span>Contact Us</span>
+                          </a>
+                        </li>
+                      </div>
+                       
+                                                               
+
+                  </ul-class>                    
+
+                </nav>
+
+            </div>
+          
+          </div>
+
+        <!-- Now adding in content onto the actual dashboard-->
+
+        <!--adding the Dashboard Title on the page
+        <main class="mt-5 pt-3">
+        <div class="container-fluid ">
+          <div class="row">
+            <div class="col-md-12 fw-bold fs-3 my-3 ps-3">
+              Dashboard
+            </div>
+          </div>-->
+
+          <!--adding the 3 cards for the Dashboard-->
+
+          <!--adding the project overview card
+          <div class="row">
+            <div class="col-md-4 mb-4">
+              <div class="card my-3 h-100 bg-cardGray">
+                <div class="card-body">
+                  <h5 class="card-title">Project Overview</h5>
+                  <p class="card-text my-4">Explore the Project's Details:</p>
+                  <a href="#" class="btn btn-dark ">
+                    <i class="bi bi-chevron-right"></i>
+                  </a>
+                </div>
+              </div>
+            </div> -->
+
+            <!--adding the panel management card
+            <div class="col-md-4 mb-4">
+              <div class="card my-3 h-100 bg-cardGray">
+                
+                <div class="card-body">
+                  <h5 class="card-title">Panel Management</h5>
+                  <p class="card-text my-4">Orientation of Solar Panels:</p>
+                  <a href="#" class="btn btn-dark">
+                    <i class="bi bi-chevron-right"></i>
+                  </a>
+                </div>
+              </div>
+            </div>-->
+
+            <!--adding the battery level card
+            <div class="col-md-4 mb-4">
+              <div class="card my-3 h-100 bg-cardGray">
+                
+                <div class="card-body">
+                  <h5 class="card-title">Battery</h5>
+                  <p class="card-text my-4">
+                    Load's Battery Level: 
+                  </p>
+
+                </div>
+              </div>
+            </div>
+          </div>    -->
+
+          <!---------------------------------------------------------------->
+        </section>
+        <?php
+            echo   '<h2> Sensor Readings: Latest ' . $readings_count . ' Readings</h2>
+                    <table cellspacing="5" cellpadding="5" id="tableReadings">
+                        <tr>
+                            <th>ID</th>
+                            <th>X</th>
+                            <th>Y</th>
+                            <th>Z</th>
+                            <th>Load Current (A)</th>
+                            <th>FET Voltage (V)</th>
+                            <th>Converter Voltage (V)</th>
+                            <th>Timestamp</th>
+                        </tr>';
+        
+            $result = getAllReadings($readings_count);
+                if ($result) {
+                while ($row = $result->fetch_assoc()) {
+                    $row_id = $row["id"];
+                    $row_sensor = $row["sensor"];
+                    $row_value1 = $row["value1"];
+                    $row_value2 = $row["value2"];
+                    $row_value3 = $row["value3"];
+                    $row_value4 = $row["value4"];
+                    $row_value5 = $row["value5"];
+                    
+                    $row_reading_time = $row["reading_time"];
+                    
+        
+                    echo '<tr>
+                            <td>' . $row_id . '</td>
+                            <td>' . $row_value1 . '</td> <!-- X-axis data -->
+                            <td>' . $row_value2 . '</td> <!-- Y-axis data -->
+                            <td>' . $row_value3 . '</td> <!-- Z-axis data -->
+                            <td>' . $row_value4 . '</td> <!-- Bus Voltage data -->
+                            <td>' . $row_value5 . '</td> <!-- Current data -->
+                            <td>' . $row_reading_time . '</td>
+                          </tr>';
+        
+                }
+                echo '</table>';
+                $result->free();
+            }
+        ?>
+        </div>
+        </main>
+
+
+
+        <script src="./js/bootstrap.bundle.min.js"></script>
+        <script src="./js/jquery-3.5.1.js"></script>
+        <script src="./js/jquery.dataTables.min.js"></script>
+        <script src="./js/dataTables.bootstrap5.min.js"></script>
+        <script src="./js/script.js"></script>
+    </body>
+</html>
+
+
+

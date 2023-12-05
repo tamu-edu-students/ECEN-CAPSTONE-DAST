@@ -1,0 +1,124 @@
+@import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap");
+body,
+
+body {
+  width: 60%;
+  margin: auto;
+  text-align: center;
+  font-family: Arial;
+  top: 50%;
+  left: 50%;
+}
+
+button {
+  font-family: "Inter", sans-serif;
+}
+:root {
+  --offcanvas-width: 270px;
+  --topNavbarHeight: 56px;
+}
+.sidebar-nav {
+  width: var(--offcanvas-width);
+}
+.sidebar-link {
+  display: flex;
+  align-items: center;
+}
+
+.sidebar-link .right-icon {
+  display: inline-flex;
+  transition: all ease 0.25s; 
+}
+
+@media screen and (max-width: 500px) /* Mobile */ {
+  .content {
+      flex-direction: column;
+  }
+}
+
+.sidebar-link[aria-expanded="true"] .right-icon {
+  transform: rotate(180deg);
+}
+
+@media (min-width: 992px) {
+  body{
+    overflow: auto !important;
+  }
+  .offcanvas-backdrop::before{
+    display: none;
+  }
+  main{
+    margin-left: var(--offcanvas-width);
+  }
+  .sidebar-nav {
+    transform: none;
+    visibility: visible !important;
+    top:var(--topNavbarHeight);
+    height: calc(100% - var(--topNavbarHeight))
+  }
+}
+
+.fixed-divider {
+  position: fixed; 
+  top: 300px; /*vertical position */
+  left: 0;
+  right: var(--offcanvas-width); /* making the width the same as the nav bar*/
+  border-top: 1px solid #fff; 
+}
+
+.bg-cardGray {
+  background-color: rgb(230, 230, 230); /* gray color here */
+}
+
+.bg-cardOffWhite {
+  background-color: rgb(249, 248, 248); /* white color here */
+}
+
+.text-black {
+  color: black; /*text color (black) */
+}
+
+.bigger-text {
+  font-size: 2rem; /* font size */
+}
+
+.mt-auto {
+  margin-bottom: auto;
+}
+
+h2 { font-size: 2.5rem; }
+
+.header {
+	 padding: 1rem;
+	 margin: 0 0 2rem 0;
+	 background: #2F4073; /* creating the background of the header navy blue*/
+}
+
+h1 { /* adjustments to header one "Dual Axis Solar Panel" */
+    font-size: 2rem;
+    font-family: Arial, sans-serif;
+    text-align: center;
+    text-transform: uppercase;
+}
+
+table {
+  margin-left: auto;
+  margin-right: auto; /* table adjustments */
+}
+
+#tableReadings { border-collapse: collapse; }
+
+#tableReadings td, #tableReadings th {
+    border: 1px solid #ddd;
+    padding: 10px;
+}
+
+#tableReadings tr:nth-child(even){ background-color: #f2f2f2; }
+
+#tableReadings tr:hover { background-color: #ddd; }
+
+#tableReadings th {
+    padding: 10px;
+    background-color: #2f4468;
+    color: white;
+}
