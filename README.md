@@ -9,7 +9,7 @@ Power - Talha Zaheer
 
 MCU - Osman Farook 
 
-Mobility and Load - Cooper Hamlin
+Load - Cooper Hamlin
 
 GUI - Alexandra Torres
 
